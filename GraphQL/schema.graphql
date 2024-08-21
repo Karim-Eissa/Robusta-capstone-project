@@ -1,0 +1,176 @@
+scalar DateTime @scalar(class: "Nuwave\\Lighthouse\\Schema\\Types\\Scalars\\DateTime")
+
+type Query {
+    user(id: ID, email: String): User @find
+    users(name: String): [User!]! @paginate(defaultCount: 10)
+    categories: [Category!]! @all
+    category(id: ID! @eq): Category @find
+    products(
+        search: String,
+        sort: String,
+        category_id: ID,
+        page: Int,
+        count: Int
+    ): [Product!]! @field(resolver: "App\\GraphQL\\Queries\\ProductQuery@listProducts")
+    orderHistory(
+        status: String
+        sort: String
+        page: Int
+        count: Int
+    ): [Order!]! @field(resolver: "App\\GraphQL\\Queries\\OrderQuery@OrderHistory") @guard
+}
+
+type Mutation {
+    registerUser(
+        name: String!
+        email: String!
+        password: String!
+        password_confirmation: String!
+    ): UserResponse! @field(resolver: "App\\GraphQL\\Mutations\\UserMutation@registerUser")
+
+    verifyEmail(
+        token: String!
+    ): VerificationResponse! @field(resolver: "App\\GraphQL\\Mutations\\UserMutation@verifyEmail")
+
+    addToCart(
+        product_id: ID!
+        quantity: Int!
+    ): CartResponse! @field(resolver: "App\\GraphQL\\Mutations\\CartMutation@addToCart") @guard
+
+    loginUser(
+        email: String!
+        password: String!
+    ): AuthResponse @field(resolver: "App\\GraphQL\\Mutations\\AuthMutation@loginUser")
+
+    createAddress(
+        input: CreateAddressInput!
+    ): Address! @field(resolver: "App\\GraphQL\\Mutations\\AddressMutation@createAddress")
+
+    checkoutOrder(
+        input: CheckoutOrderInput!
+    ): Order! @field(resolver: "App\\GraphQL\\Mutations\\OrderMutation@checkoutOrder")
+}
+
+type OrderHistoryConnection {
+    data: [Order!]! 
+}
+
+type PaginatorInfo {
+    count: Int!
+    currentPage: Int!
+    lastPage: Int!
+    perPage: Int!
+    total: Int!
+}
+
+type Order {
+    id: ID!
+    user: User!
+    address: Address! @belongsTo
+    paymentMethod: PaymentMethod! @belongsTo
+    items: [OrderItem!]!
+    total: Float!
+    status: String!
+    created_at: DateTime!
+}
+
+input CheckoutOrderInput {
+    address_id: ID!
+    payment_method_id: ID! # Use ID for payment method
+    cart_items: [CartItemInput!]!
+}
+
+input CartItemInput {
+    product_id: ID!
+    quantity: Int!
+}
+
+type PaymentMethod {
+    id: ID!
+    name: String!
+}
+
+type Address {
+    id: ID!
+    label: String!
+    name: String!
+    address_line1: String!
+    address_line2: String
+    city: String!
+    state: String!
+    postal_code: String!
+    country: String!
+    phone_number: String!
+    created_at: DateTime!
+}
+
+input CreateAddressInput {
+    label: String!
+    name: String!
+    address_line1: String!
+    address_line2: String
+    city: String!
+    state: String!
+    postal_code: String!
+    country: String!
+    phone_number: String!
+}
+
+type Category {
+    id: ID!
+    name: String!
+    description: String
+    parent_id: ID
+    parent: Category
+    subcategories: [Category!]!
+    created_at: DateTime!
+    updated_at: DateTime!
+}
+
+type User {
+    id: ID!
+    name: String!
+    email: String!
+    email_verified_at: DateTime
+    created_at: DateTime!
+    updated_at: DateTime!
+}
+
+type UserResponse {
+    user: User
+    message: String!
+}
+
+type VerificationResponse {
+    success: Boolean!
+    message: String!
+}
+
+type AuthResponse {
+    token: String!
+    user: User!
+}
+
+type Product {
+    id: ID!
+    name: String!
+    description: String!
+    price: Float!
+    category_id: ID!
+    image_url: String!
+    created_at: DateTime!
+    category: Category
+}
+
+type CartResponse {
+    success: Boolean!
+    message: String!
+}
+
+type OrderItem {
+    id: ID!
+    order: Order!
+    product: Product!
+    quantity: Int!
+    price: Float!
+}

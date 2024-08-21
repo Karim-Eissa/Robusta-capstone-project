@@ -1,0 +1,95 @@
+mutation RegisterUser {
+  registerUser(
+    name: "John Doe",
+    email: "john.doe@example.com",
+    password: "password",
+    password_confirmation: "password"
+  ) {
+    user {
+      id
+      name
+      email
+    }
+    message
+  }
+}
+
+mutation VerifyEmail {
+  verifyEmail(token: "verification_token_here") {
+    success
+    message
+  }
+}
+
+mutation AddToCart {
+  addToCart(product_id: "1", quantity: 2) {
+    success
+    message
+  }
+}
+
+mutation LoginUser {
+  loginUser(email: "john.doe@example.com", password: "password") {
+    token
+    user {
+      id
+      name
+      email
+    }
+  }
+}
+
+mutation CreateAddress {
+  createAddress(input: {
+    label: "Home",
+    name: "John Doe",
+    address_line1: "123 Main St",
+    address_line2: "Apt 4B",
+    city: "New York",
+    state: "NY",
+    postal_code: "10001",
+    country: "USA",
+    phone_number: "555-555-5555"
+  }) {
+    id
+    label
+    name
+    address_line1
+  }
+}
+
+mutation CheckoutOrder {
+  checkoutOrder(input: {
+    address_id: "1",
+    payment_method_id: "1",
+    cart_items: [
+      { product_id: "1", quantity: 2 },
+    ]
+  }) {
+    id
+    total
+    status
+    created_at
+    user {
+      id
+      name
+    }
+    address {
+      id
+      name
+    }
+    paymentMethod {
+      id
+      name
+    }
+    items {
+      id
+      quantity
+      price
+      product {
+        id
+        name
+      }
+    }
+  }
+}

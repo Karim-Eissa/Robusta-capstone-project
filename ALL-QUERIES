@@ -1,0 +1,112 @@
+query GetUserById {
+    user(id: "1") {
+      id
+      name
+      email
+      created_at
+    }
+  }
+  
+query GetUserByEmail {
+  user(email: "user@example.com") {
+    id
+    name
+    email
+    created_at
+  }
+}
+  
+query GetUsers {
+  users(name: "John") {
+    data {
+      id
+      name
+      email
+    }
+    paginatorInfo {
+      count
+      currentPage
+      lastPage
+      perPage
+      total
+    }
+  }
+}
+
+
+query GetAllCategories {
+  categories {
+    id
+    name
+    description
+    parent_id
+  }
+}
+
+
+query GetCategoryById {
+  category(id: "1") {
+    id
+    name
+    description
+    parent_id
+    parent {
+      id
+      name
+    }
+    subcategories {
+      id
+      name
+    }
+    created_at
+  }
+}
+
+
+query GetProducts {
+  products(search: "Laptop", sort: "price_desc", category_id: "1", page: 1, count: 10) {
+    id
+    name
+    description
+    price
+    category {
+      id
+      name
+    }
+  }
+}
+
+
+query GetOrderHistory {
+  orderHistory(status: "completed", sort: "created_at_desc", page: 1, count: 10) {
+    id
+    total
+    status
+    created_at
+    user {
+      id
+      name
+    }
+    address {
+      id
+      name
+      address_line1
+    }
+    paymentMethod {
+      id
+      name
+    }
+    items {
+      id
+      quantity
+      price
+      product {
+        id
+        name
+      }
+    }
+  }
+}
+
+
+
